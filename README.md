@@ -1,4 +1,5 @@
 # Gnode
+The Gnode is a part of project plantjes. The Gnode is to be placed in a field to measure the environment in order to enhance the way farmers work their fields. It has several sensors and communicates with a central Raspberry-Pi module via Bluetooth Low energy.
 
 ## Hardware
 For this project we use the Espressif ESP32 processor. During development we have the Lolin-D32 development board
@@ -7,7 +8,7 @@ For this project we use the Espressif ESP32 processor. During development we hav
  For the Gnode we want the following sensors:
 
  - Temperature
- - Humiditry
+ - Humidity
  - Some gasses
  - Rain detection
  - Air pressure
