@@ -18,6 +18,19 @@
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
+// Defines for the temperature sensor
+#define ONE_WIRE_BUS 2 // DS18B20 on NodeMCU pin D4  
+OneWire oneWire(ONE_WIRE_BUS); 
+DallasTemperature DS18B20(&oneWire); 
+
+// Defines for the GPS module
+#define RXPin 12
+#define TXPin 13
+#define GPSBaud 9600
+TinyGPSPlus gps;
+HardwareSerial ss(1);
+
+// Bluetooth stuff
 BluetoothSerial SerialBT;
 String actualMessage;
 float temp_0; // Contains the read temperature value
@@ -28,18 +41,8 @@ float humidity;
 float lng;
 float lat;
 
-#define ONE_WIRE_BUS 2 // DS18B20 on NodeMCU pin D4  
-OneWire oneWire(ONE_WIRE_BUS); 
-DallasTemperature DS18B20(&oneWire); 
-
 // Adafruit sensor
 Adafruit_AM2320 am2320 = Adafruit_AM2320();
-
-#define RXPin 12
-#define TXPin 13
-#define GPSBaud 9600
-TinyGPSPlus gps;
-HardwareSerial ss(1);
 
 boolean gps_read(){
   return (gps.location.isValid());
@@ -138,7 +141,6 @@ boolean runEvery_gps(unsigned long interval)
   return false;
 }
 
-
 void displayInfo()
 {
   Serial.print(F("Location: ")); 
@@ -186,92 +188,70 @@ void displayInfo()
   {
     Serial.print(F("INVALID"));
   }
-
-
   Serial.println();
 }
 
 void setup() {
   Serial.begin(115200);
-  DS18B20.begin(); 
-  ss.begin(GPSBaud, SERIAL_8N1, RXPin, TXPin);
-
   while (!Serial) {
     delay(10); // hang out until serial port opens
   }
 
-  Serial.println("Adafruit AM2320 Basic Test");
-  am2320.begin();
+  DS18B20.begin(); // Init temperature sensor
+  ss.begin(GPSBaud, SERIAL_8N1, RXPin, TXPin); // Init GPS module
+  am2320.begin(); // Init humidity signal
+  pinMode(17, INPUT); // Configure input pin for rain sensor
 
-  pinMode(17, INPUT);
-  SerialBT.begin("Touch my tralala1"); //Bluetooth device name
+  SerialBT.begin("Right in the Putty!"); //Bluetooth device name
+
+  Serial.println("Adafruit AM2320 Basic Test");
   Serial.println("The device started, now you can pair it with bluetooth!");
 }
 
 void loop() {
-  //if (Serial.available()) {
 
-    while (ss.available() > 0) {
-        gps.encode(ss.read());
-      }
-      if (runEvery_gps(5000)) 
-      {
-      lat = gps.location.lat();
-      lng = gps.location.lng();
-      }
+  // Request GPS data
+  while (ss.available() > 0) {
+    gps.encode(ss.read());
+  }
+  if (runEvery_gps(5000)) 
+  {
+    lat = gps.location.lat();
+    lng = gps.location.lng();
+  }
+      
+  // Request the temperature
+  DS18B20.requestTemperatures();  
+  temp_0 = DS18B20.getTempCByIndex(0); // Sensor 0 will capture Temp in Celcius
 
-      /*// Convert int temp_0 to std::string temperature
-      String strLat;
-      std::stringstream ssLat;
-      ssLat << std::fixed << std::setprecision(6) << lat;
-      strLat = ssLat.str();*/
+  //Request the humidity
+  humidity = am2320.readHumidity();
 
-      String strLat = String(lat, 6);
-      String strLng = String(lng, 6);
+  //Read digital output data from the rain sensor
+  if(digitalRead(17) == HIGH) {
+    Serial.println("No Rain Detected");
+    rainDetected = "No Rain Detected";
+  }
+  else {
+    Serial.println("Rain Detected");
+    rainDetected = "Rain Detected";
+  }
+      
+  // Convert Float to String (GPS data)
+  String strLat = String(lat, 6);
+  String strLng = String(lng, 6);
 
-      /*// Convert int temp_0 to std::string temperature
-      std::string strLng;
-      std::stringstream ssLng;
-      ssLng << std::fixed << std::setprecision(6) << lng;
-      strLng = ssLng.str();*/
+  // Convert Float to String (temperature)
+  String temperature = String(temp_0, 2);
 
-      // Request the temperature
-      DS18B20.requestTemperatures();  
-      temp_0 = DS18B20.getTempCByIndex(0); // Sensor 0 will capture Temp in Celcius
+  // Convert Float to String (humidity)
+  String strHumidity = String(humidity, 2);
 
-      /*// Convert float temp_0 to std::string temperature
-      std::string temperature;
-      std::stringstream ssTemp;
-      ssTemp << temp_0;
-      temperature = ssTemp.str();*/
+  // Combine all data into one Json stream and send the data over Bluetooth
+  actualMessage = "{\"temperature\":\"" + temperature + "\",\"Rain\":\"" + rainDetected + "\",\"Humidity\":\"" + strHumidity + "\",\"Lat\":\"" + strLat + "\",\"Lng\":\"" + strLng + "\"}";
+  SerialBT.println(actualMessage);
 
-      String temperature = String(temp_0, 2);
-
-      //Request the humidity
-      //Serial.print("Hum: "); Serial.println(am2320.readHumidity())
-      humidity = am2320.readHumidity();
-
-      String strHumidity = String(humidity, 2);
-
-
-      //Read digital output data from the rain sensor
-          if(digitalRead(17) == HIGH) {
-            Serial.println("No Rain Detected");
-            rainDetected = "No Rain Detected";
-          }
-          else {
-            Serial.println("Rain Detected");
-            rainDetected = "Rain Detected";
-          }
-
-    actualMessage = "{\"temperature\":\"" + temperature + "\",\"Rain\":\"" + rainDetected + "\",\"Humidity\":\"" + strHumidity + "\",\"Lat\":\"" + strLat + "\",\"Lng\":\"" + strLng + "\"}";
-    
-    SerialBT.println(actualMessage);
-    
-  //}
-  /*if (SerialBT.available()) {
-    Serial.write(SerialBT.read());
-  }*/
+  // Flush the data so the buffer doesn't overload  
   SerialBT.flush();
   delay(1000);
 }
