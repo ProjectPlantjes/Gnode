@@ -9,6 +9,6 @@ void setup() {
 void loop() {
     if(BLE_Connection())
     {
-       BLE_SendMessage("Bram is leip\n");
+       //BLE_SendMessage("Bram is leip\n");
     }
 }

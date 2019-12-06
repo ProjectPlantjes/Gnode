@@ -149,7 +149,7 @@ void loop() {
   // with the current time since boot.
   if (connected) {
 
-    pRemoteCharacteristic->writeValue("Client1");
+    pRemoteCharacteristic->writeValue("jAHEVFjmyevfmysdgxfsbxfs");
   
   }else if(doScan){
     BLEDevice::getScan()->start(0);  // this is just eample to start scan after disconnect, most likely there is better way to do it in arduino
