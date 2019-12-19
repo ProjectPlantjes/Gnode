@@ -14,6 +14,7 @@
 #include "Humidity.h"
 #include "RainSensor.h"
 
+
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
@@ -44,7 +45,6 @@ void loop() {
   // Combine all data into one Json stream and send the data over Bluetooth
   actualMessage = "{\"temperature\":\"" + requestTemperature() + "\",\"Rain\":\"" + requestRainSensor() + "\",\"Humidity\":\"" + requestHumidity() + "\",\"Lat\":\"" + requestGPSLat() + "\",\"Lng\":\"" + requestGPSLng() + "\"}";
   SerialBT.println(actualMessage);
-  Serial.println(actualMessage);
 
   // Flush the data so the buffer doesn't overload  
   SerialBT.flush();

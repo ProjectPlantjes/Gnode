@@ -179,14 +179,10 @@ String requestGPSLat(){
   while (ss.available() > 0) {
     gps.encode(ss.read());
   }
-  //if (runEvery_gps(5000)) 
-  //{
     lat = gps.location.lat(); // Request and save the latitude value
 
     String strLat = String(lat, 6); // Convert the latitude value to a String
     return strLat; // Return the latitude value as a String
-  //}
-  return "NULL"; // Return "NULL" if no latitude data can be retrieved
 }
 
 /* 
@@ -197,12 +193,8 @@ String requestGPSLng(){
   while (ss.available() > 0) {
     gps.encode(ss.read());
   }
-  //if (runEvery_gps(5000)) 
-  //{
     lng = gps.location.lng(); // Request and save the latitude value
 
     String strLng = String(lng, 6); // Convert the longitude value to a String
-    
-  //}
-  return strLng; // Return the latitude value as a String
+    return strLng; // Return the latitude value as a String
 }
