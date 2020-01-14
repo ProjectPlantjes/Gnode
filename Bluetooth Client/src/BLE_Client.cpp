@@ -9,8 +9,6 @@
 #include "BLEDevice.h"
 //#include "BLEScan.h"
 
-RTC_DATA_ATTR BLEClient*  pClient;
-RTC_DATA_ATTR BLEScan* pBLEScan;
 
 
 // The remote service we wish to connect to.
@@ -53,7 +51,7 @@ bool connectToServer() {
     Serial.print("Forming a connection to ");
     Serial.println(myDevice->getAddress().toString().c_str());
     
-    pClient = BLEDevice::createClient();
+    BLEClient*  pClient = BLEDevice::createClient();
     Serial.println(" - Created client");
 
     pClient->setClientCallbacks(new MyClientCallback());
@@ -128,7 +126,7 @@ void BLE_Init()
   // have detected a new device.  Specify that we want active scanning and start the
   // scan to run for 5 seconds.
 
-  pBLEScan = BLEDevice::getScan();
+  BLEScan* pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
   pBLEScan->setInterval(1349);
   pBLEScan->setWindow(449);
@@ -136,16 +134,6 @@ void BLE_Init()
   pBLEScan->start(5, false);
 }
 
-void BLE_Scan()
-{
-  //BLEDevice::init("");
-  //pBLEScan = BLEDevice::getScan();
-
-  //pBLEScan->setActiveScan(true);
-  //pBLEScan->start(5, false);
-
-  pClient->disconnect();
-}
 
 void connectToBLEServer()
 {
