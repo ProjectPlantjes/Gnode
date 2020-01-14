@@ -120,7 +120,6 @@ bool BLE_Connection()
 
   //return if connected or not
   if(deviceConnected == 1 ) {
-    printf("Connected");
     return 1;
   }
   else
