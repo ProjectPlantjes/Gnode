@@ -7,9 +7,6 @@
  */
 
 #include "BLEDevice.h"
-//#include "BLEScan.h"
-
-
 
 // The remote service we wish to connect to.
 static BLEUUID serviceUUID("4fafc201-1fb5-459e-8fcc-c5c9c331914b"); //4fafc201-1fb5-459e-8fcc-c5c9c331914b
@@ -21,8 +18,6 @@ static boolean connected = false;
 static boolean doScan = false;
 static BLERemoteCharacteristic* pRemoteCharacteristic;
 static BLEAdvertisedDevice* myDevice;
-
-
 
 static void notifyCallback(
   BLERemoteCharacteristic* pBLERemoteCharacteristic,
@@ -134,7 +129,7 @@ void BLE_Init()
   pBLEScan->start(5, false);
 }
 
-
+// Establish BLE connection
 void connectToBLEServer()
 {
   // If the flag "doConnect" is true then we have scanned for and found the desired
@@ -150,6 +145,7 @@ void connectToBLEServer()
   }
 }
 
+
 bool BLEConnection()
 {
 
@@ -164,6 +160,7 @@ bool BLEConnection()
   }
 }
 
+// Send the desired message over BLE
 void BLE_SendMessasage(std::string Message)
 {
   pRemoteCharacteristic->writeValue(Message);

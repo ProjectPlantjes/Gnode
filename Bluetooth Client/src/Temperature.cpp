@@ -31,9 +31,11 @@ void initTemperature(){
 */
 std::string requestTemperature(){
 
+  //Request and save the humidity value in Celsius
   DS18B20.requestTemperatures();  
-  temp_0 = DS18B20.getTempCByIndex(0); //Request and save the humidity value in Celsius
+  temp_0 = DS18B20.getTempCByIndex(0); 
 
+  // Init variable temperature and assign the temperature to this variable.
   std::ostringstream temperature;
   temperature << std::fixed << std::setprecision(2) << temp_0;
   

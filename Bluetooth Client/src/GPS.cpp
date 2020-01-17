@@ -205,3 +205,18 @@ std::string requestGPSLng(){
 
     return strLng.str(); // Return the latitude value as a String
 }
+
+std::string requestTime(){
+  while (ss.available() > 0) {
+    gps.encode(ss.read());
+  }
+
+    std::ostringstream stream;
+    int tsHour = gps.time.hour();
+    int tsMinute = gps.time.minute();
+    int tsSecond = gps.time.second();
+    stream << tsHour << ":" << tsMinute << ":" << tsSecond;
+    std::string str = stream.str();
+
+    return stream.str(); // Return the latitude value as a String
+}

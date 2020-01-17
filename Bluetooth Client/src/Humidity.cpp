@@ -29,7 +29,6 @@ void initHumidity()
 std::string requestHumidity()
 {
   humidity = am2320.readHumidity(); //Request and save the humidity value
-  Serial.println(humidity);
 
   std::ostringstream strHumidity;
   strHumidity << std::fixed << std::setprecision(2) << humidity;
